@@ -6,6 +6,8 @@ import 'botao.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(debugShowCheckedModeBanner: false, home: PerguntaApp());
@@ -13,34 +15,53 @@ class MyApp extends StatelessWidget {
 }
 
 class PerguntaApp extends StatefulWidget {
+  const PerguntaApp({super.key});
+
   @override
   State<PerguntaApp> createState() => _PerguntaAppState();
 }
 
 class _PerguntaAppState extends State<PerguntaApp> {
   var _perguntaSelecionada = 0;
+  int _totalNotas = 0;
 
   List<Map<String, Object>> perguntas = [
     {
       'text': 'Qual é a sua cor favorita?',
-      'respostas': ['Preto', 'Rosa', 'Verde', 'Amarelo'],
+      'respostas': [
+        {'texto': 'Preto', 'nota': 10},
+        {'texto': 'Rosa', 'nota': 9},
+        {'texto': 'Verde', 'nota': 8},
+        {'texto': 'Amarelo', 'nota': 2},
+      ],
       'respostaUsuario': '',
     },
     {
       'text': 'Qual é o seu animal favorito?',
-      'respostas': ['Gato', 'Leão', 'Cobra', 'Elefante'],
+      'respostas': [
+        {'texto': 'Gato', 'nota': 10},
+        {'texto': 'Leão', 'nota': 5},
+        {'texto': 'Cobra', 'nota': 2},
+        {'texto': 'Elefante', 'nota': 9},
+      ],
       'respostaUsuario': '',
     },
     {
-      'text': 'Qual é a melhor fase do seu namorado?',
-      'respostas': ['Feliz', 'Triste', 'Bravo', 'Todas'],
+      'text': 'Qual seu sentimento no momento?',
+      'respostas': [
+        {'texto': 'Feliz', 'nota': 10},
+        {'texto': 'Triste', 'nota': 1},
+        {'texto': 'Bravo', 'nota': 5},
+        {'texto': 'Todas', 'nota': 10},
+      ],
       'respostaUsuario': '',
     },
   ];
 
-  void _responder(String resposta) {
+  void _responder(String resposta, int nota) {
     setState(() {
       perguntas[_perguntaSelecionada]['respostaUsuario'] = resposta;
+      _totalNotas += nota;
       _perguntaSelecionada++;
     });
   }
@@ -62,7 +83,7 @@ class _PerguntaAppState extends State<PerguntaApp> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Você Respondeu Tudo, MEU DEUS <3',
+                        'Parabéns! Você respondeu tudo.',
                         style: TextStyle(fontSize: 20),
                         textAlign: TextAlign.center,
                       ),
@@ -73,7 +94,8 @@ class _PerguntaAppState extends State<PerguntaApp> {
                             MaterialPageRoute(
                               builder:
                                   (context) =>
-                                      TelaRespostas(perguntas: perguntas),
+                                      TelaRespostas(perguntas: perguntas, 
+                                      totalNotas: _totalNotas),
                             ),
                           );
                         },
@@ -119,12 +141,15 @@ class _PerguntaAppState extends State<PerguntaApp> {
                   children: [
                     Questao(perguntas[_perguntaSelecionada]['text'].toString()),
                     ...(perguntas[_perguntaSelecionada]['respostas']
-                            as List<String>)
+                            as List<Map>)
                         .map((resposta) {
                           return MeuBotao(
-                            titulo: resposta,
+                            titulo: resposta['texto'] as String,
                             onPressed: () {
-                              _responder(resposta);
+                              _responder(
+                                resposta['texto'] as String,
+                                resposta['nota'] as int,
+                              );
                             },
                             color: Color.fromARGB(28, 153, 132, 145),
                             largura: double.infinity,
